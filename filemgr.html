@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>File MGR - <!--path--></title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <h1><!--path--></h1>
+        <!--parentpath-->
+        <!--dir-->
+        <div>
+            <div>
+                <form action="/ctrl/sendfile/:path:" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="file" multiple>
+                    <input type="submit" value="Upload New File">
+                </form>
+            </div>
+            <div>
+                <form action="/ctrl/newdir/:path:" method="POST" enctype="application/x-www-form-urlencoded">
+                    <input type="text" id="dir" name="dir" placeholder="Dir Name">
+                    <input type="submit" value="New Directory">
+                </form>
+            </div>
+        </div>
+    </body>
+</html>
