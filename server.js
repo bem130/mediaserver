@@ -56,7 +56,7 @@ function filemgr(req,res,next) {
             else if (stat.isDirectory) {
                 let dirui = (new TextDecoder("utf-8")).decode(new Uint8Array(fs.readFileSync(__dirname+"/filemgr.html")));
                 let dir = fs.readdirSync(fpath);
-                let list = "<table><thead><th>Name</th><th>Class</th><th>GET</th><th>Last Edit (JST)</th><th>Last Change (JST)</th><th>Last Access (JST)</th></thead><tbody>";
+                let list = "<table><thead><th>Name</th><th>Class</th><th>GET</th><th>Delete</th><th>Last Edit (JST)</th><th>Last Change (JST)</th><th>Last Access (JST)</th></thead><tbody>";
                 for (let i=0;i<dir.length;i++) {
                     const fstats = fs.statSync(path.join(fpath,dir[i]));
                     list += `<tr> <td><a href="${path.join(req.url,dir[i])}">${dir[i]}</a></td> <td>${fstats.isFile()?"File":"Dir"}</td> <td>${fstats.isFile()?`<a href="/${path.join("data/",path2,dir[i])}">Jump</a>`:"-"}</td> <td><a href="${fstats.isFile()?`/${path.join("ctrl/delfile/",path2,dir[i])}`:`/${path.join("ctrl/deldir/",path2,dir[i])}`}">Delete</a></td> <td>${fstats.mtime.toLocaleString({timeZone:'Asia/Tokyo'})}</td> <td>${fstats.ctime.toLocaleString({timeZone:'Asia/Tokyo'})}</td> <td>${fstats.atime.toLocaleString({timeZone:'Asia/Tokyo'})}</td> </tr>`;
