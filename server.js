@@ -10,7 +10,7 @@ app.use(express.urlencoded({extended: true}));
 
 const filedir = __dirname+"/data";
 
-const upload = multer({ dest:filedir+"/tmp" })
+const upload = multer({ dest:filedir+"/tmp" });
 
 let server = app.listen(3000, function(){
     console.log("Node.js is listening to PORT:" + server.address().port);
@@ -27,7 +27,7 @@ function fileget(req,res,next) {
             res.status(404).send("<h1>404 Not Found</h1><p>No such Files or Directories</p>");
         }else{
             if (stat.isFile()) {
-                res.sendFile(fpath)
+                res.sendFile(fpath);
             }
         }
     });
@@ -39,7 +39,7 @@ function filemgr(req,res,next) {
     let path1 = req.params[0];
     if(path.join(path1)=="\\") {path1="/";path2="";}
     let fpath = `${filedir}/${path2}`.replace(/\\/g, "/");
-    console.log(req.params[0],path1,path2,path.join(path1))
+    //console.log(req.params[0],path1,path2,path.join(path1));
     fs.stat( fpath , ( er , stat ) => {
         if( er ){
             if (er.code === "ENOENT") {
@@ -51,7 +51,7 @@ function filemgr(req,res,next) {
         }else{
            // console.log( stat );
             if (stat.isFile()) {
-                res.sendFile(fpath)
+                res.sendFile(fpath);
             }
             else if (stat.isDirectory) {
                 let dirui = (new TextDecoder("utf-8")).decode(new Uint8Array(fs.readFileSync(__dirname+"/filemgr.html")));
@@ -62,11 +62,11 @@ function filemgr(req,res,next) {
                     list += `<tr> <td><a href="${path.join(req.url,dir[i])}">${dir[i]}</a></td> <td>${fstats.isFile()?"File":"Dir"}</td> <td>${fstats.isFile()?`<a href="/${path.join("data/",path2,dir[i])}">Jump</a>`:"-"}</td> <td><a href="${fstats.isFile()?`/${path.join("ctrl/delfile/",path2,dir[i])}`:`/${path.join("ctrl/deldir/",path2,dir[i])}`}">Delete</a></td> <td>${fstats.mtime.toLocaleString({timeZone:'Asia/Tokyo'})}</td> <td>${fstats.ctime.toLocaleString({timeZone:'Asia/Tokyo'})}</td> <td>${fstats.atime.toLocaleString({timeZone:'Asia/Tokyo'})}</td> </tr>`;
                 }
                 list += "</tbody></table>";
-                dirui = dirui .replace("<!--dir-->",list) .replace(/\<\!\-\-path\-\-\>/g,"/"+path2)
-                dirui = dirui .replace("<!--upload-->",`<a href="/ctrl/sendfile/${path1}">File Upload</a>`)
-                dirui = dirui .replace(/\:path\:/g,path1)
+                dirui = dirui .replace("<!--dir-->",list) .replace(/\<\!\-\-path\-\-\>/g,"/"+path2);
+                dirui = dirui .replace("<!--upload-->",`<a href="/ctrl/sendfile/${path1}">File Upload</a>`);
+                dirui = dirui .replace(/\:path\:/g,path1);
                 if (path2.length>0) {
-                    dirui = dirui .replace("<!--parentpath-->",`<a href="/mgr/${path.dirname(path1)}">./</a>`)
+                    dirui = dirui .replace("<!--parentpath-->",`<a href="/mgr/${path.dirname(path1)}">↑</a>`);
                 }
                 res.send(dirui);
             }
@@ -75,7 +75,7 @@ function filemgr(req,res,next) {
 }
 
 app.post('/ctrl/newdir/*', function (req, res) {
-    console.log(path.join(filedir,req.params[0],req.body.dir))
+    //console.log(path.join(filedir,req.params[0],req.body.dir));
     fs.mkdir(path.join(filedir,req.params[0],req.body.dir), { recursive: true }, (err) => {
         if (err) {res.send("Error: Failed Making");}
         else {res.redirect(303,"/mgr/"+req.params[0]);}
@@ -83,10 +83,10 @@ app.post('/ctrl/newdir/*', function (req, res) {
 });
 
 app.get('/ctrl/deldir/*', function (req, res) {
-    console.log(path.join(filedir,req.params[0]))
-    console.log(req.params[0])
+    //console.log(path.join(filedir,req.params[0]));
+    //console.log(req.params[0]);
     if(req.params[0]=="tmp") {
-        res.end("Error: This Dir Can't Delete")
+        res.end("Error: This Dir Can't Delete");
     }
     else {
         fs.rmdir(path.join(filedir,req.params[0]), (err) => {
@@ -96,7 +96,7 @@ app.get('/ctrl/deldir/*', function (req, res) {
     }
 });
 app.get('/ctrl/delfile/*', function (req, res) {
-    console.log(path.join(filedir,req.params[0]))
+    //console.log(path.join(filedir,req.params[0]));
     fs.unlink(path.join(filedir,req.params[0]), (err) => {
         if (err) {res.send("Error: Failed Delete")}
         else {res.redirect(303,path.dirname("/mgr/"+req.params[0])+"/");}
@@ -104,7 +104,7 @@ app.get('/ctrl/delfile/*', function (req, res) {
 });
 
 app.post('/ctrl/sendfile/*', upload.array('file', 50), function (req, res) {
-    console.log(req.params)
+    //console.log(req.params);
     if(req.params[0]==undefined) {req.params[0]="";}
     const n = req.files.length;
     try {
@@ -113,15 +113,19 @@ app.post('/ctrl/sendfile/*', upload.array('file', 50), function (req, res) {
             const dest = `${filedir}/${req.params[0]}/${req.files[i].originalname}`;
             fs.renameSync(path, dest);
         }
-        res.redirect(303,"/mgr/"+req.params[0])
+        res.redirect(303,"/mgr/"+req.params[0]);
     }
     catch (err) {
         res.send("Error: Failed Upload");
     }
 });
 
+app.get('/', function (req, res) {
+    res.sendFile(__dirname+"/index.html");
+});
+
 
 app.use((req, res, next) => {
-    console.log(req.method,req.url)
+    //console.log(req.method,req.url);
     res.status(404).send("404 Not Found");
 });
